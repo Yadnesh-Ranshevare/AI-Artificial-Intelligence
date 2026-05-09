@@ -11,8 +11,7 @@
     - A* Algorithm
     - Best First Search
     - Hill Climbing
-
-
+4. [Min Max Algorithm](#min-max-algorithm)
 
 ---
 # What is Searching?
@@ -502,6 +501,103 @@ because it is the best neighboring state.
 | Stochastic Hill Climbing      | Chooses random better neighbor  |
 
 
+
+
+
+[Go To Top](#content)
+
+---
+# Min Max Algorithm
+Minimax is a search algorithm that searches through a space of possible future states to find the optimal one.
+
+Minimax algorithm is also a decision-making algorithm used in two-player turn-based games where:
+
+- One player tries to maximize the score.
+- The other tries to minimize it.
+- Both players are assumed to play perfectly.
+
+Typical use cases:
+
+- Chess
+- Tic-Tac-Toe
+- Checkers
+- Connect Four
+
+### Core Idea
+
+You simulate all possible future moves.
+
+- MAX player chooses the move with the highest score
+- MIN player chooses the move with the lowest score
+
+The algorithm recursively explores the game tree.
+
+### Game Tree
+Example structure:
+```
+                MAX
+             /    |    \
+           MIN   MIN   MIN
+          /  \   / \   /  \
+         3   5  2  9  12  5
+```
+**Step 1 — MIN layer**\
+MIN chooses smallest values:
+
+```
+MIN(3,5) = 3
+MIN(2,9) = 2
+MIN(12,5) = 5
+```
+Now tree becomes:
+```
+                MAX
+             /    |    \
+            3     2     5
+```
+**Step 2 — MAX layer**\
+MAX chooses largest:
+```
+MAX(3,2,5) = 5
+```
+**Final answer:**\
+→ choose the branch leading to 5
+
+### Alpha-Beta Pruning
+Alpha-Beta Pruning is an optimization technique for the Minimax algorithm that eliminates branches which cannot possibly affect the final decision.
+
+> Stop searching moves that are already proven useless.
+
+#### Intuition
+```
+                MAX
+              /     \
+            MIN      MIN
+           /  \      /  \
+          3    5    2    ?
+```
+- Left MIN subtree
+
+    ```
+    min(3,5)=3
+    ```
+
+- Explore Right MIN
+
+    First child:
+    ```
+    2
+    ```
+    As this subtree will return the lowest value and the value of first child is `2`, then final value to be return will ne `2` or less than `2`
+    ```
+    min(2, x) = 2  -> 2 is lowest
+    min(2, x) = x  -> x < 2
+    ```
+    As parent node is MAX node which will accept the max value and we also know that left subtree is returning the `3` which is greater than `2`
+    
+    Therefor even if we explore the `x` and return, it won't get selected as `x < 2` always
+
+    Hence we ignore `x` to save the resources, the is what we called pruning
 
 
 
