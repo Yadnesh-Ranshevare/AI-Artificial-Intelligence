@@ -3,7 +3,9 @@
 2. [Knowledge Based Agents](#knowledge-based-agents)
 3. [Propositional Logic](#propositional-logic)
 4. [First Order Predicate Logic](#first-order-predicate-logic)
-
+5. [Forward Chaining](#forward-chaining)
+6. [Backward Chaining](#backward-chaining)
+7. [Forward vs Backward Chaining](#forward-vs-backward-chaining)
 
 ---
 
@@ -230,6 +232,201 @@ If:
 Then:
 
 - Mortal(Ram)
+
+[Go To Top](#content)
+
+---
+# Forward Chaining
+Forward chaining is a reasoning method where the system starts with known facts and keeps applying inference rules to derive new facts until it reaches a conclusion.
+
+It’s called “forward” because reasoning moves from:
+
+- data/facts → conclusions
+
+rather than the reverse.
+
+### Core Idea
+
+You have:
+
+- Knowledge Base (KB) → facts + rules
+- Inference Engine → applies rules automatically
+
+Example:
+
+- Facts
+    - `Human(Socrates)`
+    - `Human(x)` → `Mortal(x)`
+- Forward Propagation Process
+
+    The system sees:
+
+    - `Human(Socrates)` is true
+    - Rule says: if someone is human, they are mortal
+- So it derives:
+
+    - `Mortal(Socrates)`
+
+That new fact is then added back into the KB and may trigger more rules.
+
+### Structure of Forward Propagation
+
+Typically:
+
+- Rule Form
+    ```
+    IF condition THEN conclusion
+    ```
+- or in logic:
+    ```
+    P → Q
+    ```
+    If `P` becomes true, infer `Q`.
+
+### Example
+Suppose the KB contains:
+```
+A
+A → B
+B → C
+C → D
+```
+Forward propagation works like this:
+- Step 1 - Known fact:
+    ```
+    A
+    ```
+ - Step 2 - Apply:
+    ```
+    A → B
+    ```
+    Infer:
+    ```
+    B
+    ```
+- Step 3 - Apply
+    ```
+    B → C
+    ```
+    infer
+    ```
+    C
+    ```
+- Step 4 - Apply
+    ```
+    C → D
+    ```
+    Infer
+    ```
+    D
+    ```
+- Final KB:
+```
+A, B, C, D
+```
+
+[Go To Top](#content)
+
+---
+# Backward chaining
+Backward chaining is a reasoning method in knowledge representation and AI where the system starts with a goal/conclusion and works backward to determine whether the known facts can support it.
+
+It is the opposite of forward chaining.
+
+Direction:
+
+- goal → required facts
+
+instead of:
+
+- facts → conclusions
+
+
+### Example
+Suppose the knowledge base contains:
+
+- Rules
+    ```
+    A → B
+    B → C
+    C → D
+    ```
+- Facts
+    ```
+    A
+    ```
+- Now suppose we want to prove:
+    ```
+    D
+    ```
+
+#### Backward Chaining Process
+- Goal:
+    ```
+    D
+    ```
+    The system searches for a rule that concludes `D`.
+- Finds:
+    ```
+    C → D
+    ```
+    Now new subgoal becomes:
+    ```
+    C
+    ```
+- To prove `C`, find:
+    ```
+    B → C
+    ```
+    New subgoal:
+    ```
+    B
+    ```
+- To prove `B`, find:
+    ```
+    A → B
+    ```
+    New subgoal:
+    ```
+    A
+    ```
+- `A` is already a known fact.    
+
+    So:
+
+    - A true ⇒ B
+    - B true ⇒ C
+    - C true ⇒ D
+- Therefore:
+    ```
+    D
+    ```
+    is proven.
+
+### Why Backward Chaining Is Efficient
+Backward chaining only explores rules relevant to the goal.
+
+That makes it efficient when:
+
+- you have many facts
+- but only need one specific answer
+
+[Go To Top](#content)
+
+---
+# Forward vs Backward Chaining
+| Feature          | Forward Chaining                | Backward Chaining         |
+| ---------------- | ------------------------------- | ------------------------- |
+| Reasoning Type   | Data-driven                     | Goal-driven               |
+| Starts From      | Facts                           | Goal                      |
+| Direction        | Facts → Conclusion              | Goal → Facts              |
+| Main Objective   | Derive all possible conclusions | Prove specific conclusion |
+| Search Style     | Broad exploration               | Targeted exploration      |
+| Efficiency       | Can waste computation           | Usually more efficient    |
+| Best For         | Dynamic environments            | Specific queries          |
+| Typical Use      | Monitoring systems              | Diagnostic systems        |
+| Example Language | Production systems              | Prolog                    |
+
 
 [Go To Top](#content)
 
