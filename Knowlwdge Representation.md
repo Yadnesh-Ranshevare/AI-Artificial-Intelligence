@@ -6,6 +6,10 @@
 5. [Forward Chaining](#forward-chaining)
 6. [Backward Chaining](#backward-chaining)
 7. [Forward vs Backward Chaining](#forward-vs-backward-chaining)
+8. [Total Order Planning (TOP)](#total-order-planning-top)
+9. [Partial Order Planning (POP)](#partial-order-planning-pop)
+10. [Hierarchical Planning](#hierarchical-planning)
+11. [Conditional Planning](#conditional-planning)
 
 ---
 
@@ -426,6 +430,387 @@ That makes it efficient when:
 | Best For         | Dynamic environments            | Specific queries          |
 | Typical Use      | Monitoring systems              | Diagnostic systems        |
 | Example Language | Production systems              | Prolog                    |
+
+
+[Go To Top](#content)
+
+---
+# Total Order Planning (TOP)
+Total Order Planning is an AI planning method where every action is arranged in one exact fixed sequence.
+
+Example:
+```
+Step1 → Step2 → Step3 → Step4
+```
+The planner decides the complete execution order beforehand.
+
+### Core Idea
+In total order planning:
+
+“At any moment, the next action is fully determined.”
+
+### Simple Example
+Goal:
+```
+Make tea
+```
+A total order planner may create:
+```
+1. Get cup
+2. Boil water
+3. Add tea bag
+4. Pour water
+```
+Even if:
+- some actions are independent
+
+the planner still fixes their order.
+
+### Key Characteristic
+
+Every pair of actions has an ordering relation.
+
+For example:
+```
+A before B
+B before C
+C before D
+```
+The entire plan becomes a single chain.
+
+### Advantages of Total Order Planning
+| Advantage                    | Why                        |
+| ---------------------------- | -------------------------- |
+| Simple execution             | Easy to follow             |
+| Easy debugging               | Exact sequence known       |
+| Lower management complexity  | Fewer constraints to track |
+| Good for deterministic tasks | Stable environments        |
+
+
+### Disadvantages
+Suppose two tasks are independent:
+```
+Charge battery
+Download updates
+```
+They could happen simultaneously.
+
+But TOP may force:
+```
+Charge → Download
+```
+This:
+
+- wastes time
+- reduces flexibility
+- limits parallel execution
+
+
+[Go To Top](#content)
+
+---
+# Partial Order Planning (POP)
+It’s a planning technique used in AI where actions are not forced into a strict sequence unless necessary.
+
+Instead of deciding:
+```
+Step1 → Step2 → Step3
+```
+POP says:
+
+“Only define ordering when one action truly depends on another.”
+
+This creates a flexible plan.
+
+### Core Idea
+Traditional planning:
+
+- fixes exact order of every action
+
+Partial order planning:
+
+- leaves independent actions unordered
+
+because unnecessary ordering reduces flexibility.
+
+### Example
+Goal:
+```
+Make tea
+```
+Actions:
+
+- Boil water
+- Get cup
+- Add tea bag
+- Pour water
+
+Necessary constraints:
+```
+Boil water before pouring
+Tea bag before pouring
+```
+But:
+```
+Get cup
+```
+can happen anytime.
+
+So POP avoids unnecessarily fixing its position.
+
+### Why This Matters
+Rigid planning causes problems.
+
+Suppose robot planning says:
+```
+A → B → C → D
+```
+If B fails:
+
+- whole chain may collapse
+
+Partial ordering gives flexibility:
+
+- independent tasks can still proceed
+
+This is useful in:
+
+- robotics
+- scheduling
+- automated agents
+- workflow systems
+
+### Important Property
+
+POP is also called: “Least Commitment Planning”
+
+Because it delays decisions until necessary.
+
+That’s the real philosophy behind it.
+
+Instead of prematurely fixing order,
+it keeps options open.
+
+
+
+### Structure of Partial Order Planning
+A POP plan contains:
+
+| Component            | Meaning                                    |
+| -------------------- | ------------------------------------------ |
+| Actions              | Tasks to perform                           |
+| Ordering constraints | Required sequence rules                    |
+| Causal links         | One action satisfies another’s requirement |
+| Open preconditions   | Goals still unresolved                     |
+
+### Key Concept: Causal Link
+Suppose:
+```
+Boil Water → Pour Water
+```
+Why?
+
+Because:
+
+- “Pour Water” requires hot water
+- “Boil Water” produces hot water
+
+This dependency is called a causal link.
+
+### Steps in Partial Order Planning
+
+Typically:
+
+1. Start with goal
+2. Choose action satisfying goal
+3. Add causal links
+4. Add ordering constraints only when needed
+5. Resolve conflicts/threats
+6. Continue until all preconditions satisfied
+
+### Real Weakness of POP
+POP sounds elegant, but in practice:
+
+- managing constraints becomes complex
+- threat detection is expensive
+- modern planners often use heuristic/state-space methods instead
+
+So don’t assume POP dominates modern AI planning.
+
+It’s foundational academically, but not always the most practical approach today.
+
+
+[Go To Top](#content)
+
+---
+# Hierarchical Planning
+Hierarchical Planning is an AI planning technique where a big complex goal is broken into smaller subgoals step-by-step.
+
+Instead of planning everything at low level immediately, the system plans in layers.
+
+### Core Idea
+Think of it like this:
+```
+High-level goal
+    ↓
+Subtasks
+    ↓
+Smaller actions
+    ↓
+Executable steps
+```
+This is similar to how humans naturally solve problems.
+
+You don’t think:
+
+### Example
+
+Goal:
+```
+Organize a birthday party
+```
+High-Level Tasks
+
+1. Arrange venue
+2. Arrange food
+3. Invite people
+
+Further Breakdown
+
+- Arrange food\
+    becomes:
+    - Choose menu
+    - Order food
+    - Confirm delivery
+- Invite people\
+    becomes:
+    - Create guest list
+    - Send invitations
+
+Eventually you reach executable actions.
+
+### Terminology
+| Term           | Meaning                     |
+| -------------- | --------------------------- |
+| Abstract task  | High-level goal             |
+| Primitive task | Executable action           |
+| Decomposition  | Breaking task into subtasks |
+
+### Advantages
+| Advantage                | Why                                      |
+| ------------------------ | ---------------------------------------- |
+| Handles complex problems | Breaks large tasks into manageable parts |
+| More human-like          | Mirrors human reasoning                  |
+| Efficient search         | Reduces planning complexity              |
+| Reusable task structures | Common decompositions reused             |
+
+### Weaknesses
+Hierarchical planning depends heavily on:
+
+- predefined decomposition knowledge
+- handcrafted task structures
+
+Meaning:
+
+- someone usually needs to design the hierarchy.
+
+So it’s less flexible in unknown environments.
+
+[Go To Top](#content)
+
+---
+# Conditional Planning
+Conditional Planning is an AI planning technique where the planner prepares different actions for different possible situations or outcomes.
+
+Instead of making one fixed plan, it creates:
+```
+IF condition A → do X
+ELSE → do Y
+```
+So the plan can adapt during execution.
+
+### Core Idea
+Normal planning assumes:
+
+- environment behaves predictably
+
+Conditional planning assumes:
+
+- uncertainty exists
+- outcomes may differ
+
+Therefore the planner includes branches.
+
+### Simple Example
+Goal:
+```
+Go to college
+```
+Conditional plan:
+```
+IF raining:
+    take umbrella
+
+ELSE:
+    go normally
+```
+The action depends on the condition.
+
+### Why Conditional Planning Exists
+Real-world environments are uncertain.
+
+Things can fail:
+
+- sensors may detect obstacles
+- doors may be locked
+- internet may disconnect
+- traffic may occur
+
+Rigid plans fail easily.
+
+Conditional planning improves robustness.
+
+### Structure of Conditional Plan
+A conditional plan usually contains:
+| Component    | Meaning                               |
+| ------------ | ------------------------------------- |
+| Actions      | Tasks performed                       |
+| Conditions   | Situations checked                    |
+| Branches     | Alternative paths                     |
+| Observations | Information gathered during execution |
+
+### Key Feature: Sensing
+Conditional planning often requires:
+- observing environment state
+
+Example:
+```
+IF obstacle detected:
+    turn left
+ELSE:
+    move forward
+```
+The system must sense whether obstacle exists.
+
+### Major Advantage
+
+Handles uncertainty better.
+
+Instead of collapsing when something unexpected happens,
+the system already has backup paths.
+
+### Major Weakness
+
+Plans become huge quickly.
+
+Every uncertainty creates branches:
+```
+2 possibilities → 2 branches
+10 possibilities → explosion
+```
+This is called: Combinatorial Explosion
+
+One of the biggest problems in AI planning.
 
 
 [Go To Top](#content)
